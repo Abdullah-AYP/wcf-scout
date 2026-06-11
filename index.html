@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WCF Scout 2026 — Differential & Captaincy AI Tool</title>
+<meta name="description" content="AI-powered FIFA World Cup Fantasy 2026 tool. Find differentials under 5% ownership for the scouting bonus and get AI captaincy recommendations."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0A0A0A;
+    --bg2: #111111;
+    --bg3: #1A1A1A;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.18);
+    --green: #00FF87;
+    --green-dim: rgba(0,255,135,0.12);
+    --green-mid: rgba(0,255,135,0.25);
+    --text: #F0F0F0;
+    --text2: #888888;
+    --text3: #555555;
+    --amber: #FFB547;
+    --red: #FF5757;
+    --blue: #5B9CF6;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem;
+    height: 60px;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 16px; color: var(--text);
+    display: flex; align-items: center; gap: 8px; text-decoration: none;
+  }
+  .nav-logo .dot { color: var(--green); }
+  .nav-links { display: flex; gap: 6px; }
+  .nav-links a {
+    font-size: 13px; color: var(--text2); text-decoration: none;
+    padding: 6px 12px; border-radius: var(--radius);
+    transition: color .2s, background .2s;
+  }
+  .nav-links a:hover { color: var(--text); background: var(--bg3); }
+  .nav-badge {
+    font-size: 11px; font-weight: 600; padding: 4px 10px;
+    background: var(--green-dim); color: var(--green);
+    border: 1px solid rgba(0,255,135,0.3); border-radius: 20px;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 100px 2rem 60px;
+    position: relative; overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,135,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,135,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .hero-glow {
+    position: absolute; top: 20%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,255,135,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--green);
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after {
+    content: ''; flex: 1; max-width: 40px;
+    height: 1px; background: var(--green); opacity: .4;
+  }
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2.6rem, 6vw, 5rem);
+    font-weight: 700; line-height: 1.08;
+    margin-bottom: 1.5rem;
+    letter-spacing: -.02em;
+  }
+  .hero h1 .accent { color: var(--green); }
+  .hero p {
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    color: var(--text2); max-width: 520px;
+    margin: 0 auto 2.5rem; line-height: 1.7;
+  }
+  .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-green {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 600;
+    padding: 12px 24px; border-radius: var(--radius);
+    background: var(--green); color: #000;
+    border: none; cursor: pointer; text-decoration: none;
+    transition: opacity .2s, transform .15s;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .btn-green:hover { opacity: .88; transform: translateY(-1px); }
+  .btn-outline {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 500;
+    padding: 12px 24px; border-radius: var(--radius);
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border-hover); cursor: pointer;
+    text-decoration: none; transition: border-color .2s, background .2s;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .btn-outline:hover { border-color: var(--green); background: var(--green-dim); }
+
+  /* PULSE RING — the signature element */
+  .pulse-ring {
+    position: relative; width: 200px; height: 200px;
+    margin: 3rem auto 1rem;
+  }
+  .pulse-ring svg { width: 100%; height: 100%; }
+  .ring-label {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .ring-label .pct { font-size: 2.8rem; font-weight: 700; color: var(--green); }
+  .ring-label .sub { font-size: 11px; color: var(--text2); letter-spacing: .06em; text-transform: uppercase; }
+
+  /* STATS ROW */
+  .stats-row {
+    display: flex; gap: 1px; justify-content: center;
+    background: var(--border); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    max-width: 600px; margin: 2rem auto 0;
+  }
+  .stat-item {
+    flex: 1; padding: 16px 20px;
+    background: var(--bg2); text-align: center;
+  }
+  .stat-item .val {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem; font-weight: 700; color: var(--text);
+    display: block;
+  }
+  .stat-item .lbl { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+  /* SECTION */
+  section { padding: 80px 2rem; max-width: 1000px; margin: 0 auto; }
+  .section-tag {
+    font-size: 11px; font-weight: 600; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--green);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 700; line-height: 1.15;
+    margin-bottom: 1rem; letter-spacing: -.02em;
+  }
+  .section-sub {
+    font-size: 1rem; color: var(--text2);
+    max-width: 520px; line-height: 1.7; margin-bottom: 2.5rem;
+  }
+
+  /* SCORING TABLE */
+  .scoring-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px;
+  }
+  .scoring-table th {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--text2);
+    padding: 10px 14px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .scoring-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .scoring-table tr:hover td { background: var(--bg3); }
+  .scoring-table tr.highlight td { background: var(--green-dim); }
+  .scoring-table tr.highlight td:first-child {
+    border-left: 2px solid var(--green);
+  }
+  .pts-cell {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+  }
+  .pts-green { color: var(--green); }
+  .pts-amber { color: var(--amber); }
+  .pts-red { color: var(--red); }
+  .table-wrap {
+    border: 1px solid var(--border); border-radius: var(--radius-lg);
+    overflow: hidden; background: var(--bg2);
+  }
+
+  /* TOOL SECTION */
+  .tool-wrap {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .tool-tabs {
+    display: flex; border-bottom: 1px solid var(--border);
+  }
+  .tool-tab {
+    flex: 1; padding: 16px 20px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; font-weight: 600;
+    border: none; background: none; cursor: pointer;
+    color: var(--text2); border-bottom: 2px solid transparent;
+    transition: color .2s; display: flex; align-items: center;
+    gap: 7px; justify-content: center;
+  }
+  .tool-tab.active { color: var(--green); border-bottom-color: var(--green); }
+  .tool-tab:hover:not(.active) { color: var(--text); background: var(--bg3); }
+  .tool-panel { display: none; padding: 1.75rem; }
+  .tool-panel.active { display: block; }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label {
+    font-size: 11px; font-weight: 600; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--text2);
+  }
+  .form-group input, .form-group select {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 9px 12px;
+    font-size: 13px; color: var(--text); font-family: 'Inter', sans-serif;
+    transition: border-color .2s;
+    -webkit-appearance: none;
+  }
+  .form-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+    padding-right: 30px;
+  }
+  .form-group input:focus, .form-group select:focus {
+    outline: none; border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(0,255,135,0.1);
+  }
+  .form-group input::placeholder { color: var(--text3); }
+  .hint-row {
+    background: var(--green-dim); border: 1px solid rgba(0,255,135,0.2);
+    border-radius: var(--radius); padding: 10px 14px;
+    font-size: 12px; color: rgba(0,255,135,0.85);
+    margin-bottom: 14px; line-height: 1.5;
+  }
+  .btn-submit {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 700;
+    width: 100%; padding: 13px;
+    background: var(--green); color: #000;
+    border: none; border-radius: var(--radius);
+    cursor: pointer; transition: opacity .2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    letter-spacing: .01em;
+  }
+  .btn-submit:hover { opacity: .88; }
+  .btn-submit:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* RESULT */
+  .result-area {
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg3);
+    padding: 16px;
+    display: none;
+    font-size: 13px; line-height: 1.8;
+    color: var(--text);
+  }
+  .result-area.visible { display: block; }
+  .result-top {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 600;
+  }
+  .badge {
+    font-size: 10px; font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 20px;
+  }
+  .badge-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,255,135,.3); }
+  .badge-amber { background: rgba(255,181,71,.1); color: var(--amber); border: 1px solid rgba(255,181,71,.3); }
+  .badge-blue { background: rgba(91,156,246,.1); color: var(--blue); border: 1px solid rgba(91,156,246,.3); }
+  .loading-text {
+    color: var(--text2); display: flex; align-items: center; gap: 8px;
+    font-size: 13px;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* PLAYER TAGS */
+  .player-input-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 8px; align-items: flex-end; margin-bottom: 10px;
+  }
+  .btn-add {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 9px 14px; border-radius: var(--radius);
+    background: var(--green-dim); color: var(--green);
+    border: 1px solid rgba(0,255,135,.3); cursor: pointer;
+    white-space: nowrap; transition: background .2s;
+  }
+  .btn-add:hover { background: rgba(0,255,135,.2); }
+  .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; min-height: 28px; }
+  .tag {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 4px 10px; font-size: 12px;
+  }
+  .tag .tag-remove {
+    background: none; border: none; cursor: pointer;
+    color: var(--text3); font-size: 15px; line-height: 1; padding: 0;
+    transition: color .15s;
+  }
+  .tag .tag-remove:hover { color: var(--red); }
+
+  /* HOW IT WORKS */
+  .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .step-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1.5rem;
+    position: relative;
+  }
+  .step-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; font-weight: 700; color: var(--green);
+    letter-spacing: .08em; margin-bottom: 12px;
+  }
+  .step-icon {
+    font-size: 28px; margin-bottom: 12px; display: block;
+  }
+  .step-card h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px; font-weight: 600; margin-bottom: 6px;
+  }
+  .step-card p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem; text-align: center;
+    font-size: 12px; color: var(--text3);
+  }
+  footer a { color: var(--text2); text-decoration: none; }
+  footer a:hover { color: var(--green); }
+  .footer-inner { max-width: 600px; margin: 0 auto; }
+  .footer-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px; font-weight: 700;
+    color: var(--text); margin-bottom: 8px;
+  }
+  .footer-logo span { color: var(--green); }
+
+  /* DIVIDER */
+  .full-divider { height: 1px; background: var(--border); margin: 0; }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid.three { grid-template-columns: 1fr 1fr; }
+    .player-input-row { grid-template-columns: 1fr 1fr; }
+    .player-input-row input:last-of-type { grid-column: span 2; }
+    .stats-row { flex-direction: column; background: none; border: none; gap: 8px; }
+    .stat-item { border: 1px solid var(--border); border-radius: var(--radius); }
+    nav .nav-links { display: none; }
+  }
+
+  /* PULSE ANIMATION */
+  @keyframes pulse-ring {
+    0% { r: 72; opacity: .6; }
+    50% { r: 78; opacity: .3; }
+    100% { r: 72; opacity: .6; }
+  }
+  .pulse-anim { animation: pulse-ring 2.2s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">WCF<span class="dot">.</span>Scout</a>
+  <div class="nav-links">
+    <a href="#tool">Tool</a>
+    <a href="#scoring">Scoring</a>
+    <a href="#how">How it works</a>
+  </div>
+  <span class="nav-badge">⚡ World Cup Live</span>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-eyebrow">WCF Scout 2026</div>
+
+  <h1>Find the players<br/>nobody<br/><span class="accent">owns yet</span></h1>
+
+  <p>AI-powered differential finder and captaincy optimizer for FIFA World Cup Fantasy 2026. Built around the scouting bonus — the rule that rewards you for going against the crowd.</p>
+
+  <div class="hero-ctas">
+    <a href="#tool" class="btn-green">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Scout a player
+    </a>
+    <a href="#scoring" class="btn-outline">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Scoring rules
+    </a>
+  </div>
+
+  <!-- Signature: pulse ring visualizing the 5% threshold -->
+  <div class="pulse-ring" aria-hidden="true">
+    <svg viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="78" fill="none" stroke="rgba(0,255,135,0.06)" stroke-width="28"/>
+      <circle cx="100" cy="100" class="pulse-anim" fill="rgba(0,255,135,0.08)" stroke="rgba(0,255,135,0.25)" stroke-width="1.5"/>
+      <circle cx="100" cy="100" r="58" fill="rgba(0,255,135,0.05)" stroke="rgba(0,255,135,0.35)" stroke-width="1"/>
+      <!-- arc representing 5% of the full circle -->
+      <circle cx="100" cy="100" r="72" fill="none" stroke="#00FF87" stroke-width="4"
+        stroke-dasharray="22.6 428" stroke-dashoffset="113"
+        stroke-linecap="round"/>
+      <circle cx="100" cy="100" r="72" fill="none" stroke="rgba(0,255,135,0.12)" stroke-width="1.5"/>
+    </svg>
+    <div class="ring-label">
+      <span class="pct">5%</span>
+      <span class="sub">threshold</span>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-item">
+      <span class="val">+2 pts</span>
+      <div class="lbl">Scouting bonus</div>
+    </div>
+    <div class="stat-item">
+      <span class="val">&lt;5%</span>
+      <div class="lbl">Ownership required</div>
+    </div>
+    <div class="stat-item">
+      <span class="val">4+</span>
+      <div class="lbl">Points to trigger</div>
+    </div>
+    <div class="stat-item">
+      <span class="val">2×</span>
+      <div class="lbl">Captain multiplier</div>
+    </div>
+  </div>
+</div>
+
+<div class="full-divider"></div>
+
+<!-- TOOL SECTION -->
+<section id="tool">
+  <div class="section-tag">AI Tool</div>
+  <h2 class="section-title">Scout & Optimize</h2>
+  <p class="section-sub">Enter a player's details or your full squad and get AI-powered analysis with real WCF scoring math.</p>
+
+  <div class="tool-wrap">
+    <div class="tool-tabs">
+      <button class="tool-tab active" onclick="switchTab('diff', this)" id="tab-diff">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+        Differential Scout
+      </button>
+      <button class="tool-tab" onclick="switchTab('cap', this)" id="tab-cap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Captaincy Optimizer
+      </button>
+    </div>
+
+    <!-- DIFF PANEL -->
+    <div class="tool-panel active" id="panel-diff">
+      <div class="hint-row">
+        Players under <strong>5% ownership</strong> who score 4+ points earn you an extra <strong>+2 scouting bonus</strong>. This tool calculates whether it's worth the differential risk.
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Player name</label>
+          <input type="text" id="d-name" placeholder="e.g. Raphinha"/>
+        </div>
+        <div class="form-group">
+          <label>Position</label>
+          <select id="d-pos">
+            <option>Midfielder</option>
+            <option>Forward</option>
+            <option>Defender</option>
+            <option>Goalkeeper</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid three">
+        <div class="form-group">
+          <label>Ownership %</label>
+          <input type="number" id="d-own" placeholder="e.g. 3.2" min="0" max="100" step="0.1"/>
+        </div>
+        <div class="form-group">
+          <label>Price ($m)</label>
+          <input type="number" id="d-price" placeholder="e.g. 8.5" step="0.5"/>
+        </div>
+        <div class="form-group">
+          <label>Team / Nation</label>
+          <input type="text" id="d-team" placeholder="e.g. Brazil"/>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Next opponent</label>
+          <input type="text" id="d-opp" placeholder="e.g. Canada (weak defense)"/>
+        </div>
+        <div class="form-group">
+          <label>Recent form / notes</label>
+          <input type="text" id="d-form" placeholder="e.g. 2 goals in last 2 games"/>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Extra context</label>
+        <input type="text" id="d-ctx" placeholder="e.g. takes penalties and corners, fully fit"/>
+      </div>
+      <button class="btn-submit" id="d-btn" onclick="runDiff()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Analyse differential potential
+      </button>
+      <div class="result-area" id="d-result">
+        <div class="result-top">
+          <span class="result-name" id="d-result-name"></span>
+          <span class="badge" id="d-result-badge"></span>
+        </div>
+        <div id="d-result-body"></div>
+      </div>
+    </div>
+
+    <!-- CAPTAIN PANEL -->
+    <div class="tool-panel" id="panel-cap">
+      <div class="hint-row">
+        Add your starting XI below. Claude will rank your best captaincy options using fixture difficulty, scoring potential, and WCF rules.
+      </div>
+      <div class="player-input-row">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="c-pname" placeholder="e.g. Vinicius Jr"/>
+        </div>
+        <div class="form-group">
+          <label>Team</label>
+          <input type="text" id="c-pteam" placeholder="e.g. Brazil"/>
+        </div>
+        <div class="form-group">
+          <label>Fixture</label>
+          <input type="text" id="c-pfix" placeholder="e.g. vs Canada"/>
+        </div>
+        <button class="btn-add" onclick="addPlayer()">+ Add</button>
+      </div>
+      <div class="tags" id="player-tags"></div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Matchday context (optional)</label>
+        <input type="text" id="c-ctx" placeholder="e.g. MD2 group stage, Haaland doubt, must-win games"/>
+      </div>
+      <button class="btn-submit" id="c-btn" onclick="runCaptain()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Get captaincy recommendation
+      </button>
+      <div class="result-area" id="c-result">
+        <div class="result-top">
+          <span class="result-name">AI Recommendation</span>
+          <span class="badge badge-blue" id="c-result-badge"></span>
+        </div>
+        <div id="c-result-body"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- SCORING SECTION -->
+<section id="scoring">
+  <div class="section-tag">Reference</div>
+  <h2 class="section-title">WCF 2026 scoring rules</h2>
+  <p class="section-sub">All official scoring mechanics used by the AI in every analysis.</p>
+
+  <div class="table-wrap">
+    <table class="scoring-table">
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>GK</th>
+          <th>DEF</th>
+          <th>MID</th>
+          <th>FWD</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Goal scored</td><td class="pts-cell pts-green">6</td><td class="pts-cell pts-green">6</td><td class="pts-cell pts-green">5</td><td class="pts-cell pts-green">4</td></tr>
+        <tr><td>Outside-box goal bonus</td><td class="pts-cell pts-green">+1</td><td class="pts-cell pts-green">+1</td><td class="pts-cell pts-green">+1</td><td class="pts-cell pts-green">+1</td></tr>
+        <tr><td>Assist</td><td class="pts-cell pts-green">3</td><td class="pts-cell pts-green">3</td><td class="pts-cell pts-green">3</td><td class="pts-cell pts-green">3</td></tr>
+        <tr><td>Clean sheet (60+ min)</td><td class="pts-cell pts-green">4</td><td class="pts-cell pts-green">4</td><td class="pts-cell pts-green">1</td><td class="pts-cell">—</td></tr>
+        <tr><td>Playing 60+ min</td><td class="pts-cell">2</td><td class="pts-cell">2</td><td class="pts-cell">2</td><td class="pts-cell">2</td></tr>
+        <tr><td>Playing 1–59 min</td><td class="pts-cell">1</td><td class="pts-cell">1</td><td class="pts-cell">1</td><td class="pts-cell">1</td></tr>
+        <tr><td>Save (per 3)</td><td class="pts-cell pts-green">1</td><td class="pts-cell">—</td><td class="pts-cell">—</td><td class="pts-cell">—</td></tr>
+        <tr><td>Chances created (per 2)</td><td class="pts-cell">1</td><td class="pts-cell">1</td><td class="pts-cell">1</td><td class="pts-cell">1</td></tr>
+        <tr><td>Shots on target (per 3)</td><td class="pts-cell">—</td><td class="pts-cell">1</td><td class="pts-cell">1</td><td class="pts-cell">1</td></tr>
+        <tr><td>Tackles won (per 3)</td><td class="pts-cell">—</td><td class="pts-cell">—</td><td class="pts-cell">1</td><td class="pts-cell">—</td></tr>
+        <tr><td>Balls recovered (per 3)</td><td class="pts-cell">1</td><td class="pts-cell">1</td><td class="pts-cell">1</td><td class="pts-cell">1</td></tr>
+        <tr><td>POTM award</td><td class="pts-cell pts-amber">+2</td><td class="pts-cell pts-amber">+2</td><td class="pts-cell pts-amber">+2</td><td class="pts-cell pts-amber">+2</td></tr>
+        <tr><td>Yellow card</td><td class="pts-cell pts-red">-1</td><td class="pts-cell pts-red">-1</td><td class="pts-cell pts-red">-1</td><td class="pts-cell pts-red">-1</td></tr>
+        <tr><td>Red card</td><td class="pts-cell pts-red">-3</td><td class="pts-cell pts-red">-3</td><td class="pts-cell pts-red">-3</td><td class="pts-cell pts-red">-3</td></tr>
+        <tr><td>Own goal</td><td class="pts-cell pts-red">-2</td><td class="pts-cell pts-red">-2</td><td class="pts-cell pts-red">-2</td><td class="pts-cell pts-red">-2</td></tr>
+        <tr><td>Missed penalty</td><td class="pts-cell pts-red">-2</td><td class="pts-cell pts-red">-2</td><td class="pts-cell pts-red">-2</td><td class="pts-cell pts-red">-2</td></tr>
+        <tr class="highlight">
+          <td><strong>Scouting bonus</strong> (&lt;5% owned + 4+ pts in match)</td>
+          <td class="pts-cell pts-green"><strong>+2</strong></td>
+          <td class="pts-cell pts-green"><strong>+2</strong></td>
+          <td class="pts-cell pts-green"><strong>+2</strong></td>
+          <td class="pts-cell pts-green"><strong>+2</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-tag">How it works</div>
+  <h2 class="section-title">Under the hood</h2>
+  <p class="section-sub">WCF Scout uses Claude (Anthropic's AI) with the full WCF 2026 scoring rulebook embedded in every analysis.</p>
+
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num">STEP 01</div>
+      <span class="step-icon">📋</span>
+      <h3>You enter the details</h3>
+      <p>Player name, position, ownership %, fixture, and recent form. The more context you give, the sharper the analysis.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">STEP 02</div>
+      <span class="step-icon">🤖</span>
+      <h3>Claude analyses</h3>
+      <p>The AI references official WCF scoring rules to calculate a realistic point ceiling, broken down action by action.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">STEP 03</div>
+      <span class="step-icon">⚡</span>
+      <h3>Scouting bonus check</h3>
+      <p>If the player is under 5% owned, the +2 scouting bonus is automatically factored into the ceiling score.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">STEP 04</div>
+      <span class="step-icon">✅</span>
+      <h3>Verdict delivered</h3>
+      <p>Strong Pick / Moderate / Risky verdict with key risks, captaincy potential, and a one-line final call.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">WCF<span>.</span>Scout</div>
+    <p style="margin-bottom:16px">Built for FIFA World Cup Fantasy 2026 managers. Powered by Claude AI.</p>
+
+    <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
+      <div style="width:40px; height:40px; border-radius:50%; background:rgba(0,255,135,0.12); border:1px solid rgba(0,255,135,0.25); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14px; color:#00FF87;">AY</div>
+      <div style="text-align:left;">
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; color:#F0F0F0;">Abdullah Yousuf</div>
+        <div style="font-size:12px; color:#555; margin-top:1px;">Made for the football fans ⚽</div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+      <a href="https://www.linkedin.com/in/abdullah-yousuf-140925311/" target="_blank" rel="noopener"
+        style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); font-size:12px; font-weight:500; color:#888; text-decoration:none; transition:all .2s;"
+        onmouseover="this.style.borderColor='#0A66C2';this.style.color='#0A66C2';"
+        onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='#888';">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://github.com/Abdullah-AYP/Abdullah-AYP" target="_blank" rel="noopener"
+        style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); font-size:12px; font-weight:500; color:#888; text-decoration:none; transition:all .2s;"
+        onmouseover="this.style.borderColor='#00FF87';this.style.color='#00FF87';"
+        onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='#888';">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub
+      </a>
+    </div>
+
+    <p style="font-size:11px; color:#333;">Not affiliated with FIFA or the official WCF game. &nbsp;·&nbsp; <a href="https://play.fifa.com/fantasy" target="_blank" rel="noopener" style="color:#444;">Official WCF game ↗</a></p>
+  </div>
+</footer>
+
+<script>
+const players = [];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tool-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+function addPlayer() {
+  const name = document.getElementById('c-pname').value.trim();
+  const team = document.getElementById('c-pteam').value.trim();
+  const fix = document.getElementById('c-pfix').value.trim();
+  if (!name) return;
+  if (players.length >= 11) { alert('Max 11 players in a starting XI'); return; }
+  players.push({ name, team, fixture: fix });
+  renderTags();
+  ['c-pname','c-pteam','c-pfix'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('c-pname').focus();
+}
+
+function removePlayer(i) {
+  players.splice(i, 1);
+  renderTags();
+}
+
+function renderTags() {
+  document.getElementById('player-tags').innerHTML = players.map((p, i) =>
+    `<span class="tag">
+      <span>${p.name}${p.team ? ' <span style="color:var(--text2)">(${p.team})</span>' : ''}${p.fixture ? ` <span style="color:var(--text3)">· ${p.fixture}</span>` : ''}</span>
+      <button class="tag-remove" onclick="removePlayer(${i})" aria-label="Remove ${p.name}">×</button>
+    </span>`
+  ).join('');
+}
+
+function showLoading(resultId) {
+  const el = document.getElementById(resultId);
+  el.classList.add('visible');
+  const body = resultId === 'd-result' ? 'd-result-body' : 'c-result-body';
+  document.getElementById(body).innerHTML = `<div class="loading-text"><div class="spinner"></div>Claude is analysing…</div>`;
+}
+
+async function callClaude(prompt) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: `You are an expert FIFA World Cup Fantasy 2026 analyst. Give sharp, specific, actionable advice.
+
+Official WCF 2026 scoring:
+- Goal: GK/DEF=6pts, MID=5pts, FWD=4pts (+1 outside box)
+- Assist: 3pts all positions
+- Clean sheet (60+ min): GK/DEF=4pts, MID=1pt, FWD=0
+- Playing 60+ min: 2pts | 1-59 min: 1pt
+- GK saves per 3: 1pt
+- Chances created per 2: 1pt (all)
+- Shots on target per 3: 1pt (outfield)
+- Tackles won per 3: 1pt (MID only)
+- Balls recovered per 3: 1pt (all)
+- POTM: +2pts
+- Yellow: -1 | Red: -3 | Own goal: -2 | Missed pen: -2
+- Captain = 2x round points
+- SCOUTING BONUS: +2pts if owned by <5% of managers AND scores 4+ pts in that match
+
+Use plain text only. No markdown asterisks or bullet symbols. Use numbered lists and line breaks for structure.`,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content.map(b => b.text || '').join('');
+}
+
+async function runDiff() {
+  const name = document.getElementById('d-name').value.trim();
+  const pos = document.getElementById('d-pos').value;
+  const own = document.getElementById('d-own').value;
+  const price = document.getElementById('d-price').value;
+  const team = document.getElementById('d-team').value.trim();
+  const opp = document.getElementById('d-opp').value.trim();
+  const form = document.getElementById('d-form').value.trim();
+  const ctx = document.getElementById('d-ctx').value.trim();
+  if (!name) { alert('Enter a player name first'); return; }
+
+  const btn = document.getElementById('d-btn');
+  btn.disabled = true;
+  showLoading('d-result');
+
+  const ownNum = parseFloat(own) || 0;
+  const isBonus = ownNum > 0 && ownNum < 5;
+
+  const prompt = `Analyse this WCF 2026 differential:
+
+Player: ${name}
+Position: ${pos}
+Ownership: ${own || 'unknown'}%
+Price: $${price || 'unknown'}m
+Team: ${team || 'unknown'}
+Fixture: ${opp || 'unknown'}
+Form: ${form || 'not provided'}
+Context: ${ctx || 'none'}
+Scouting bonus eligible: ${isBonus ? 'YES - under 5%, qualifies for +2 if scores 4+ pts' : ownNum === 0 ? 'Unknown ownership - note threshold' : 'NO - above 5%'}
+
+Give:
+1. Verdict (Strong Pick / Moderate / Risky) — one sentence reason
+2. Point ceiling breakdown by action (e.g. "60+ min: 2pts, goal: 5pts, assist: 3pts = 10pts ceiling")
+3. Scouting bonus boosted ceiling if eligible (add +2)
+4. Two key risks
+5. Captain verdict (yes/no + brief reason)
+6. One-line final recommendation
+
+Be specific and reference actual point values.`;
+
+  try {
+    const text = await callClaude(prompt);
+    document.getElementById('d-result-name').textContent = name + ' · ' + pos;
+    const badge = document.getElementById('d-result-badge');
+    if (isBonus) {
+      badge.className = 'badge badge-green';
+      badge.textContent = 'Scouting bonus eligible';
+    } else {
+      badge.className = 'badge badge-amber';
+      badge.textContent = 'Above 5% threshold';
+    }
+    document.getElementById('d-result-body').innerHTML = text.replace(/\n/g, '<br>');
+  } catch(e) {
+    document.getElementById('d-result-body').innerHTML = `<span style="color:var(--red)">Error: ${e.message}</span>`;
+  }
+  btn.disabled = false;
+}
+
+async function runCaptain() {
+  if (players.length < 2) { alert('Add at least 2 players to compare'); return; }
+  const ctx = document.getElementById('c-ctx').value.trim();
+  const btn = document.getElementById('c-btn');
+  btn.disabled = true;
+  showLoading('c-result');
+
+  const list = players.map((p,i) =>
+    `${i+1}. ${p.name}${p.team ? ' ('+p.team+')' : ''}${p.fixture ? ' — fixture: '+p.fixture : ''}`
+  ).join('\n');
+
+  const prompt = `Captaincy advice for WCF 2026. My squad:
+
+${list}
+
+${ctx ? 'Context: ' + ctx : ''}
+
+Give:
+1. Top 3 captaincy candidates ranked — brief reason each (reference fixture + scoring potential)
+2. Clear winner with confidence level: High / Medium / Low
+3. Vice-captain suggestion + reason
+4. Any differential captaincy punt from this squad (under 5% ownership if mentioned, or low-profile player)
+5. One key risk to watch
+
+Be direct. Reference WCF scoring mechanics.`;
+
+  try {
+    const text = await callClaude(prompt);
+    document.getElementById('c-result-badge').textContent = players.length + ' players analysed';
+    document.getElementById('c-result-body').innerHTML = text.replace(/\n/g, '<br>');
+  } catch(e) {
+    document.getElementById('c-result-body').innerHTML = `<span style="color:var(--red)">Error: ${e.message}</span>`;
+  }
+  btn.disabled = false;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.activeElement.id === 'c-pname') addPlayer();
+  if (e.key === 'Enter' && document.activeElement.id === 'd-name') runDiff();
+});
+</script>
+</body>
+</html>
